@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Passenger Details</title>
+<link rel="stylesheet" href="C:\Users\hp\OneDrive\Desktop\My Project\TT8L-02\static\passenger details.css">
+</head>
+<body>
+<div class="container">
+    <h2>Passenger Details</h2>
+    <form action="payment.html" method="post">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="age">Age:</label>
+            <input type="text" id="age" name="age" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="phone">Contact Number:</label>
+            <input type="tel" id="phone" name="phone" required>
+        </div>
+        <h3>Order Food (optional)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Food</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Sandwich</td>
+                    <td>MYR4.50</td>
+                    <td><input type="number" name="sandwich_quantity" min="0"></td>
+                </tr>
+                <tr>
+                    <td>Chicken Burger</td>
+                    <td>MYR6.00</td>
+                    <td><input type="number" name="chickenburger_quantity" min="0"></td>
+                </tr>
+                <tr>
+                    <td>7Days Vanilla Croissant</td>
+                    <td>MYR1.00</td>
+                    <td><input type="number" name="7DaysVanillaCroissant_quantity" min="0"></td>
+                </tr>
+                <tr>
+                    <td>7Days Chocolate Croissant</td>
+                    <td>MYR1.00</td>
+                    <td><input type="number" name="7DaysChcocalateCroissant_quantity" min="0"></td>
+                </tr>
+                <tr>
+                    <td>Nasi Lemak</td>
+                    <td>MYR3.00</td>
+                    <td><input type="number" name="nasilemak_quantity" min="0"></td>
+                </tr>
+                <tr>
+                    <td>Chicken Rice</td>
+                    <td>MYR3.00</td>
+                    <td><input type="number" name="chickenrice_quantity" min="0"></td>
+                </tr>
+            </tbody>
+        </table>
+        <input type="submit" class="submit-btn" value="Proceed to Pay">
+    </form>
+</div>       
+</body>
+</html>
