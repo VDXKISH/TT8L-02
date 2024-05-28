@@ -3,29 +3,80 @@
 <head>
 <title>Departure selection</title>
 <link rel="stylesheet" href="style.css">
+<script defer src="https://cdn.jsdelivr.net/npm/pyscript@0.1.0/dist/pyscript.core.min.js"></script>
 <head/>
 <body>
-<h1 class="h1">welcome to bus ticket system</h1>
+    <style>
+        table, th, td {
+          border:1px solid black;
+          background-color: white;
+          font-family: 'Courier New', Courier, monospace;
+        }
+    
+        label{
+            background-color: white;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: large;
+        }
+        </style>
+    
+<h1 class="toitle">welcome to lightning bus</h1>
 </body>
-<form>
-    <lable for="Depart">Departure:</lable><br>
-    <select id="state" name="state"><br>
-    <option hidden selected>-- select an option --</option>
+<form action="C:\Users\NG\OneDrive\文档\Jun Cong\Mini It project-group 2\TT8L-02\bus departure.py">
+    <select id="state" name="state">
+    <option hidden selected>From</option>
         <option value="sel">Selangor</option>
         <option value="'jb">Johor Baharu</option>
         <option value="'pn">Penanag</option>
-    </select><br>
-    <labale for="arrive">Arrival:</labale><br>
-    <select id="a state" name="'state"><br>
-    <option>-- select an option --</option>
+    </select>
+    <select id="state" name="toState">
+        <option hidden selected>To</option>
         <option value="sel">Selangor</option>
         <option value="jb">Johor Baharu</option>
-        <option value="'pn">Penanag</option>
-        <option selected="jb" ></option>
+        <option value="pn">Penang</option>
     </select>
-    <input type="text" id="Arrival" Name="Arrival"><br>
-    <lable for="'Departure date">Departure date</lable><br>
-    <input type="datetime-local" id="Departure date" Name="Departure date"><br>
-    <input type="submit" value="submit"
+    <label for="Departure_date">Departure date</label>
+    <input type="datetime-local" id="Departure_date" name="Departure_date">
+    <label for="Returning date(optional)">Returning date(Optional)</lable>
+    <input type="datetime-local" id="Returning date" name="Returning date">
+    <input type="submit" value="Search">
 </form>
+
+
+<table style="width:100%">
+    <tr>
+      <th>Bus number</th>
+      <th>Bus departure and departure terminal</th>
+      <th>Duration</th>
+      <th>Arrival terminal and eatimated arrival time</th>
+      <th>Fare</th>
+      <th>seat avability</th>
+      <th>choose seat</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
+  </table>
 
