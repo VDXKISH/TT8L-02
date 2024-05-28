@@ -26,50 +26,86 @@
             <label for="phone">Contact Number:</label>
             <input type="tel" id="phone" name="phone" required>
         </div>
-        <h3>Order Food (optional)</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Food</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Sandwich</td>
-                    <td>MYR4.50</td>
-                    <td><input type="number" name="sandwich_quantity" min="0"></td>
-                </tr>
-                <tr>
-                    <td>Chicken Burger</td>
-                    <td>MYR6.00</td>
-                    <td><input type="number" name="chickenburger_quantity" min="0"></td>
-                </tr>
-                <tr>
-                    <td>7Days Vanilla Croissant</td>
-                    <td>MYR1.00</td>
-                    <td><input type="number" name="7DaysVanillaCroissant_quantity" min="0"></td>
-                </tr>
-                <tr>
-                    <td>7Days Chocolate Croissant</td>
-                    <td>MYR1.00</td>
-                    <td><input type="number" name="7DaysChcocalateCroissant_quantity" min="0"></td>
-                </tr>
-                <tr>
-                    <td>Nasi Lemak</td>
-                    <td>MYR3.00</td>
-                    <td><input type="number" name="nasilemak_quantity" min="0"></td>
-                </tr>
-                <tr>
-                    <td>Chicken Rice</td>
-                    <td>MYR3.00</td>
-                    <td><input type="number" name="chickenrice_quantity" min="0"></td>
-                </tr>
-            </tbody>
-        </table>
-        <input type="submit" class="submit-btn" value="Proceed to Pay">
+
+<div class="food-section">
+    <h3>Order Food (optional)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Food</th>
+          <th>Price</th>
+          <th>Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sandwich</td>
+          <td>MYR4.50</td>
+          <td><input type="number" name="sandwich_quantity" min="0" max="20"></td>
+        </tr>
+        <tr>
+          <td>Chicken Burger</td>
+          <td>MYR6.00</td>
+          <td><input type="number" name="chickenburger_quantity" min="0" max="20"></td>
+        </tr>
+        <tr>
+          <td>7Days Vanilla Croissant</td>
+          <td>MYR1.00</td>
+          <td><input type="number" name="7DaysVanillaCroissant_quantity" min="0" max="30"></td>
+        </tr>
+        <tr>
+          <td>7Days Chocolate Croissant</td>
+          <td>MYR1.00</td>
+          <td><input type="number" name="7DaysChcocalateCroissant_quantity" min="0" max="30"></td>
+        </tr>
+        <tr>
+          <td>Nasi Lemak</td>
+          <td>MYR3.00</td>
+          <td><input type="number" name="nasilemak_quantity" min="0" max="20"></td>
+        </tr>
+        <tr>
+          <td>Chicken Rice</td>
+          <td>MYR3.00</td>
+          <td><input type="number" name="chickenrice_quantity" min="0" max="20"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>  
+
+      <input type="submit" class="submit-btn" value="Proceed to Pay">
     </form>
-</div>       
+  </div>
+
+  <script>
+    let selectedTickets = JSON.parse(sessionStorage.getItem("selectedTickets"));
+
+    let passengerInfo = document.querySelector(".passenger-info");
+
+    selectedTickets.forEach((ticket, index) => {
+      let passengerNum = index + 1;
+      passengerInfo.insertAdjacentHTML(
+        "beforeend",
+        `<div class="passenger">
+          <h3>Passenger ${passengerNum}</h3>
+          <div class="form-group">
+            <label for="name${passengerNum}">Name:</label>
+            <input type="text" id="name${passengerNum}" name="name${passengerNum}" required>
+          </div>
+          <div class="form-group">
+            <label for="age${passengerNum}">Age:</label>
+            <input type="text" id="age${passengerNum}" name="age${passengerNum}" required>
+          </div>
+          <div class="form-group">
+            <label for="email${passengerNum}">Email:</label>
+            <input type="email" id="email${passengerNum}" name="email${passengerNum}" required>
+          </div>
+          <div class="form-group">
+            <label for="phone${passengerNum}">Contact Number:</label>
+            <input type="tel" id="phone${passengerNum}" name="phone${passengerNum}" required>
+          </div>
+        </div>`
+      );
+    });
+  </script>
 </body>
 </html>
