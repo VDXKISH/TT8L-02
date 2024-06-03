@@ -143,7 +143,7 @@ login_html = '''
 </html>
 '''
 
-# HTML and CSS for the sign-up page
+
 SIGN_UP_html = '''
 <!DOCTYPE html>
 <html lang="en"> 
