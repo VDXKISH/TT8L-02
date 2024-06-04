@@ -2,8 +2,7 @@
 <html>
 <head>
 <title>Departure selection</title>
-<link rel="stylesheet" href="style.css">
-<script defer src="https://cdn.jsdelivr.net/npm/pyscript@0.1.0/dist/pyscript.core.min.js"></script>
+<link rel="stylesheet" href="/static/style.css">
 <head/>
 <body>
     <style>
@@ -55,6 +54,11 @@
     </tr>
     <tr>
       <td>1</td>
+      {% for post in posts %}
+        <p>{{posts.name}}</p>
+      {% endfor %}
+      <td></td>
+      <td></td>
       <td></td>
       <td></td>
       <td></td>
@@ -64,15 +68,24 @@
       <td></td>
       <td></td>
       <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
     </tr>
     <tr>
         <td>3</td>
         <td></td>
         <td></td>
         <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
     </tr>
     <tr>
         <td>4</td>
+        <td></td>
+        <td></td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
