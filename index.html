@@ -20,29 +20,30 @@
         </style>
     
 <h1 class="toitle">welcome to lightning bus</h1>
-</body>
-<form action="C:\Users\NG\OneDrive\文档\Jun Cong\Mini It project-group 2\TT8L-02\bus departure.py">
+<script src="app.js"></script>
+<form >
     <select id="state" name="state">
     <option hidden selected>From</option>
         <option value="sel">Selangor</option>
         <option value="'jb">Johor Baharu</option>
         <option value="'pn">Penanag</option>
     </select>
-    <select id="state" name="toState">
+    <select id="wait" name="toState">
         <option hidden selected>To</option>
         <option value="sel">Selangor</option>
         <option value="jb">Johor Baharu</option>
         <option value="pn">Penang</option>
     </select>
     <label for="Departure_date">Departure date</label>
-    <input type="datetime-local" id="Departure_date" name="Departure_date">
-    <label for="Returning date(optional)">Returning date(Optional)</lable>
-    <input type="datetime-local" id="Returning date" name="Returning date">
-    <input type="submit" value="Search">
+    <input type="date" id="Departure_date" name="Departure_date">
+    <label for="Returning date">Returning date(Optional)</lable>
+    <input type="date" id="Returning_date" name="Returning date">
+    <input type="submit" value="Search" id="mysubmit" >
 </form>
 
 
 <table style="width:100%">
+  <tbody>
     <tr>
       <th>Bus number</th>
       <th>Bus departure and departure terminal</th>
@@ -52,11 +53,9 @@
       <th>seat avability</th>
       <th>choose seat</th>
     </tr>
-    <tr>
+    <tr >
       <td>1</td>
-      {% for post in posts %}
-        <p>{{posts.name}}</p>
-      {% endfor %}
+      <td></td>
       <td></td>
       <td></td>
       <td></td>
@@ -90,6 +89,6 @@
         <td></td>
         <td></td>
     </tr>
-
+    </tbody>
   </table>
-
+</body>
