@@ -1,29 +1,47 @@
+const express = require('express');
 const fs = require('fs');
 
-// Read the JSON data from file
-fs.readFile('data.json', 'utf8', (err, data) => {
-    if (err) {
-        console.error('Error reading JSON file:', err);
-        return;
-    }
+const app = express();
+const port = 3000;
 
-    try {
-        // Parse the JSON data
-        const jsonData = JSON.parse(data);
-
-        // Process the data (filtering, etc.)
-        const filteredData = jsonData.filter(item => {
-            return item.state === state && item.wait === wait && item.date === date && item.r_date === r_date;
-        });
-
-        // Update the table (assuming you have the updateTable function defined)
-        updateTable(filteredData);
-    } catch (err) {
-        console.error('Error parsing JSON data:', err);
-    }
+// Serve HTML page
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
 });
 
-// Define the updateTable function
-function updateTable(data) {
-    // Your table update logic here
-}
+// Handle form submission
+app.get('/submit', (req, res) => {
+    // Extract user input from query parameters
+    const state = req.query.state;
+    const wait = req.query.wait;
+    const date = req.query.date;
+
+    // Read and parse JSON data
+    fs.readFile('data.json', 'utf8', (err, data) => {
+        if (err) {
+            console.error('Error reading JSON file:', err);
+            res.status(500).send('Internal Server Error');
+            return;
+        }
+
+        try {
+            const jsonData = JSON.parse(data);
+
+            // Filter JSON data based on user input
+            const filteredData = jsonData.filter(item => {
+                return item.state === state && item.wait === wait && item.date === date;
+            });
+
+            // Return filtered data as JSON response
+            res.json(filteredData);
+        } catch (err) {
+            console.error('Error parsing JSON data:', err);
+            res.status(500).send('Internal Server Error');
+        }
+    });
+});
+
+// Start the server
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+});
