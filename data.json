@@ -1,1 +1,3 @@
-{"state":"sel" , "wait":"jb" ,"date":"16/6/2024", "fare":"RM 20", "place to depart":"T6"}
+[
+    {"state":"sel", "wait":"jb", "date":"16/6/2024", "fare":"RM 20", "place to depart":"T6"}
+]
