@@ -1,3 +1,117 @@
 [
-    {"state":"sel", "wait":"jb", "date":"16/6/2024", "fare":"RM 20", "place to depart":"T6"}
+    {
+        "state": "Selangor",
+        "wait": "Johor Baharu",
+        "date": "2024-06-16",
+        "busNumber": "1",
+        "departureTerminal": "Terminal A",
+        "estimatedDepartureTime": "09:00",
+        "duration": "5 hours",
+        "arrivalTerminal": "Terminal B",
+        "estimatedArrivalTime": "14:00",
+        "fare": "MYR22",
+        "seatAvailability": "80"
+    },
+    {
+        "busNumber": "2",
+        "state": "Selangor",
+        "wait": "Johor Baharu",
+        "departureTerminal": "Terminal A",
+        "estimatedDepartureTime": "10:00",
+        "duration": "5 hours",
+        "arrivalTerminal": "Terminal B",
+        "estimatedArrivalTime": "15:00",
+        "fare": "MYR22",
+        "seatAvailability": "80"
+    },
+    {
+        "busNumber": "3",
+        "state": "Selangor",
+        "wait": "Johor Baharu",
+        "departureTerminal": "Terminal A",
+        "estimatedDepartureTime": "11:00",
+        "duration": "5 hours",
+        "arrivalTerminal": "Terminal B",
+        "estimatedArrivalTime": "16:00",
+        "fare": "MYR22",
+        "seatAvailability": "80"
+    },
+    {
+        "state": "Selangor",
+        "wait": "Penang",
+        "date": "2024-06-16",
+        "busNumber": "1",
+        "departureTerminal": "Terminal A",
+        "estimatedDepartureTime": "09:00",
+        "duration": "5 hours",
+        "arrivalTerminal": "Terminal B",
+        "estimatedArrivalTime": "14:00",
+        "fare": "MYR22",
+        "seatAvailability": "80"
+    },
+    {
+        "state": "Selangor",
+        "wait": "Johor Baharu",
+        "date": "2024-06-16",
+        "busNumber": "2",
+        "departureTerminal": "Terminal A",
+        "estimatedDepartureTime": "10:00",
+        "duration": "5 hours",
+        "arrivalTerminal": "Terminal B",
+        "estimatedArrivalTime": "15:00",
+        "fare": "MYR22",
+        "seatAvailability": "80"
+    },
+    {
+        "state": "Selangor",
+        "wait": "Johor Baharu",
+        "date": "2024-06-16",
+        "busNumber": "3",
+        "departureTerminal": "Terminal A",
+        "estimatedDepartureTime": "11:00",
+        "duration": "5 hours",
+        "arrivalTerminal": "Terminal B",
+        "estimatedArrivalTime": "16:00",
+        "fare": "MYR22",
+        "seatAvailability": "80"
+    }, 
+    {
+        "state": "Selangor",
+        "wait": "Johor Baharu",
+        "date": "2024-06-16",
+        "busNumber": "4",
+        "departureTerminal": "Terminal C",
+        "estimatedDepartureTime": "12:00",
+        "duration": "5 hours",
+        "arrivalTerminal": "Terminal A",
+        "estimatedArrivalTime": "17:00",
+        "fare": "MYR22",
+        "seatAvailability": "80"
+    },
+    {
+        "state": "Selangor",
+        "wait": "Johor Baharu",
+        "date": "2024-06-16",
+        "busNumber": "5",
+        "departureTerminal": "Terminal C",
+        "estimatedDepartureTime": "13:00",
+        "duration": "5 hours",
+        "arrivalTerminal": "Terminal A",
+        "estimatedArrivalTime": "18:00",
+        "fare": "MYR22",
+        "seatAvailability": "80"
+    }, 
+    {
+        "state": "Selangor",
+        "wait": "Johor Baharu",
+        "date": "2024-06-16",
+        "busNumber": "6 (Overnight class)",
+        "departureTerminal": "Terminal B",
+        "estimatedDepartureTime": "00:00",
+        "duration": "5 hours",
+        "arrivalTerminal": "Terminal A",
+        "estimatedArrivalTime": "05:00",
+        "fare": "MYR20",
+        "seatAvailability": "80"
+    }
 ]

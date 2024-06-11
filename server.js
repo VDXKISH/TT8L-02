@@ -1,22 +1,25 @@
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const port = 3000;
 
-// Serve HTML page
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Handle form submission
 app.get('/submit', (req, res) => {
-    // Extract user input from query parameters
     const state = req.query.state;
     const wait = req.query.wait;
     const date = req.query.date;
+    console.log(state)
+    console.log(wait)
+    console.log(date)
 
-    // Read and parse JSON data
     fs.readFile('data.json', 'utf8', (err, data) => {
         if (err) {
             console.error('Error reading JSON file:', err);
@@ -28,11 +31,11 @@ app.get('/submit', (req, res) => {
             const jsonData = JSON.parse(data);
 
             // Filter JSON data based on user input
-            const filteredData = jsonData.filter(item => {
-                return item.state === state && item.wait === wait && item.date === date;
+            const filteredData = jsonData.filter(data => {
+                return data.state === state && data.wait === wait && data.date === date;
             });
+            console.log(filteredData)
 
-            // Return filtered data as JSON response
             res.json(filteredData);
         } catch (err) {
             console.error('Error parsing JSON data:', err);
@@ -45,3 +48,4 @@ app.get('/submit', (req, res) => {
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
+

@@ -1,94 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Departure selection</title>
-<link rel="stylesheet" href="style.css">
-<head/>
+    <title>Departure selection</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-    <style>
-        table, th, td {
-          border:1px solid black;
-          background-color: white;
-          font-family: 'Courier New', Courier, monospace;
-        }
+    <h1 class="title">Welcome to Lightning Bus</h1>
+    <form id="searchForm">
+        <label for="state">Departure</label>
+        <select id="state" name="state">
+            <option hidden selected>From</option>
+            <option value="Selangor">Selangor</option>
+            <option value="Johor Baharu">Johor Baharu</option>
+            <option value="Penang">Penang</option>
+        </select>
+        <label for="wait">Arrival</label>
+        <select id="wait" name="wait">
+            <option hidden selected>To</option>
+            <option value="Selangor">Selangor</option>
+            <option value="Johor Baharu">Johor Baharu</option>
+            <option value="Penang">Penang</option>
+        </select>
+        <label for="Departure_date">Departure date</label>
+        <input type="date" id="Departure_date" name="date">
+        <input type="submit" value="Search" id="mysubmit">
+    </form>
     
-        label{
-            background-color: white;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: large;
-        }
-        </style>
-    
-<h1 class="toitle">welcome to lightning bus</h1>
-<script src="server.js"></script>
-<form action="http://localhost:3000" method="post" enctype="multipart/form-data">
-    <select id="state" name="state">
-    <option hidden selected>From</option>
-        <option value="sel">Selangor</option>
-        <option value="'jb">Johor Baharu</option>
-        <option value="'pn">Penanag</option>
-    </select>
-    <select id="wait" name="toState">
-        <option hidden selected>To</option>
-        <option value="sel">Selangor</option>
-        <option value="jb">Johor Baharu</option>
-        <option value="pn">Penang</option>
-    </select>
-    <label for="Departure_date">Departure date</label>
-    <input type="date" id="Departure_date" name="Departure_date">
-    <label for="Returning date">Returning date(Optional)</lable>
-    <input type="date" id="Returning_date" name="Returning date">
-    <input type="submit" value="Search" id="mysubmit" >
-</form>
+    <table id="busInfo" style="width:100%">
+        <thead>
+            <tr>
+                <th>Bus number</th>
+                <th>Bus departure and departure terminal</th>
+                <th>Duration</th>
+                <th>Arrival terminal and estimated arrival time</th>
+                <th>Fare</th>
+                <th>Seat availability</th>
+                <th>Choose seat</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Bus info will be dynamically inserted here -->
+        </tbody>
+    </table>
 
-
-<table style="width:100%">
-  <tbody>
-    <tr>
-      <th>Bus number</th>
-      <th>Bus departure and departure terminal</th>
-      <th>Duration</th>
-      <th>Arrival terminal and eatimated arrival time</th>
-      <th>Fare</th>
-      <th>seat avability</th>
-      <th>choose seat</th>
-    </tr>
-    <tr >
-      <td>1</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
-        <td>3</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>4</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    </tbody>
-  </table>
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form from submitting the traditional way
+            const formData = new FormData(event.target);
+            const params = new URLSearchParams(formData).toString();
+            
+            fetch(`/submit?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#busInfo tbody');
+                    tableBody.innerHTML = ''; // Clear previous results
+                    
+                    if (data.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="7">No buses found for the selected route and date.</td></tr>';
+                    } else {
+                        data.forEach(data => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${data.busNumber}</td>
+                                <td>${data.departureTerminal} (${data.estimatedDepartureTime})</td>
+                                <td>${data.duration}</td>
+                                <td>${data.arrivalTerminal} (${data.estimatedArrivalTime})</td>
+                                <td>${data.fare}</td>
+                                <td>${data.seatAvailability}</td>
+                                <td><button>Select Seat</button></td>
+                            `;
+                            tableBody.appendChild(row);
+                            console.log(data)
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        });
+    </script>
 </body>
+</html>
