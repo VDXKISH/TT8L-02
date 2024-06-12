@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bus Seat Booking</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="C:\Users\hp\OneDrive\Desktop\My Project\TT8L-02\static\seat.css">
+  <link rel="stylesheet" href="/static/seat.css">
 </head>
 <body>
   <div class="center">
@@ -77,10 +77,31 @@
       });
     });
 
-    
     document.getElementById("proceedBtn").addEventListener("click", function() {
-      window.location.href = "C:\\Users\\hp\\OneDrive\\Desktop\\My Project\\TT8L-02\\template\\passenger details.html";
-    });      
-  </script>
+    let selectedSeats = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(seat => seat.id);
+    
+    // Send selected seat IDs to the server
+    fetch('/saveSeats', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ selectedSeats: selectedSeats })
+    })
+    .then(response => {
+        if (response.ok) {
+            // Redirect to passenger details page
+            window.location.replace("/template/passenger_details.html");
+        } else {
+            return response.text().then(text => {
+                throw new Error(text || 'Failed to book seat');
+            });
+        }
+    })
+    .catch(error => {
+        alert(error.message);
+    });
+});
+  </script>      
 </body>
 </html>
