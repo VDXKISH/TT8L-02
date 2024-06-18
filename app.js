@@ -1,23 +1,26 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
-const port = 3033;
+const port = 3006;
 
-// Middleware to parse request bodies
+let latestBatchId = ''; // Variable to store the latest batch ID
+
+// Middleware to parse URL-encoded data and JSON
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Serve static files
-app.use(express.static('static'));
+// Serve static files from the 'static' directory
+app.use(express.static(path.join(__dirname, 'static')));
 
-// Set seat.html as the first page
+// Serve seat selection page
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'template', 'seat.html'));
 });
 
-// Route to handle saving selected seats to a text file
+// Handle seat selection submission
 app.post('/saveSeats', (req, res) => {
     const selectedSeats = req.body.selectedSeats;
     console.log('Received seats:', selectedSeats);
@@ -31,20 +34,20 @@ app.post('/saveSeats', (req, res) => {
     });
 });
 
-// Serve passenger_details.html
+// Serve passenger details page
 app.get('/passenger_details', (req, res) => {
     res.sendFile(path.join(__dirname, 'template', 'passenger_details.html'));
 });
 
 app.post('/savePassengerDetails', (req, res) => {
     const passengerDetails = req.body.passengers;
+    const batchId = uuidv4(); // Unique identifier for this batch of passenger details
 
-    // Initialize total payment due for all passengers
+    latestBatchId = batchId; // Update the latest batch ID
+
     let overallTotalAmount = 0;
 
-    // Prepare the data to be saved
     const data = passengerDetails.map(passenger => {
-        // Calculate ticket price based on age
         let ticketPrice;
         if (passenger.age >= 4 && passenger.age <= 12) {
             ticketPrice = 12;
@@ -54,7 +57,6 @@ app.post('/savePassengerDetails', (req, res) => {
             ticketPrice = 0;
         }
 
-        // Calculate total amount based on food orders
         let foodTotalAmount = 0;
         let foodOrder = {};
         for (let foodItem in passenger.food) {
@@ -66,27 +68,83 @@ app.post('/savePassengerDetails', (req, res) => {
             }
         }
 
-        // Calculate total price including ticket and food
         let totalPrice = ticketPrice + foodTotalAmount;
 
-        // Accumulate to the overall total amount
         overallTotalAmount += totalPrice;
 
-        return `Seat: ${passenger.seat}, Name: ${passenger.name}, Age: ${passenger.age}, Ticket Price: MYR ${ticketPrice}, Food Order: ${JSON.stringify(foodOrder)}, Total Amount: MYR ${totalPrice}\n`;
+        return `BatchId: ${batchId}, Seat: ${passenger.seat}, Name: ${passenger.name}, Age: ${passenger.age}, Ticket Price: MYR ${ticketPrice}, Food Order: ${JSON.stringify(foodOrder)}, Total Amount: MYR ${totalPrice}\n`;
     }).join('');
 
-    // Save passenger data to the file
     fs.appendFile('selected_seats.txt', data, (err) => {
         if (err) {
             console.error('Failed to save passenger details:', err);
             return res.status(500).send('Failed to save passenger details');
         }
         console.log('Passenger details saved successfully');
-        // Send the total amount to be paid as response
-        res.status(200).send(`Total Amount to be paid: MYR ${overallTotalAmount}`);
+        res.status(200).send(overallTotalAmount.toFixed(2));
     });
 });
 
+// Serve payment page
+app.get('/payment', (req, res) => {
+    res.sendFile(path.join(__dirname, 'template', 'payment.html'));
+});
+
+// Handle payment submission
+app.post('/payment', (req, res) => {
+    // Process payment logic here
+    // Assuming validation and processing of payment data
+
+    // Redirect to receipt page after payment processing
+    res.redirect('/receipt');
+});
+
+app.get('/receipt', (req, res) => {
+    fs.readFile('selected_seats.txt', 'utf8', (err, data) => {
+        if (err) {
+            console.error('Failed to read passenger details:', err);
+            return res.status(500).send('Failed to generate invoice');
+        }
+
+        const passengers = data.split('\n').filter(line => line.trim() !== '');
+
+        const filteredPassengers = passengers.filter(passenger => passenger.includes(`BatchId: ${latestBatchId}`));
+
+        let overallTotalAmount = 0;
+        const receiptRows = filteredPassengers.map(passenger => {
+            const details = passenger.split(', ');
+            const totalPriceStr = details.find(detail => detail.includes('Total Amount: MYR'));
+            const totalPrice = parseFloat(totalPriceStr.split('Total Amount: MYR ')[1]);
+            overallTotalAmount += totalPrice;
+
+            return `
+                <tr>
+                    <td>${details[1].split(': ')[1]}</td>
+                    <td>${details[2].split(': ')[1]}</td>
+                    <td>${details[3].split(': ')[1]}</td>
+                    <td>${details[4].split(': ')[1]}</td>
+                    <td>${details[5].split(': ')[1]}</td>
+                    <td>${totalPrice.toFixed(2)}</td>
+                </tr>
+            `;
+        }).join('');
+
+        fs.readFile(path.join(__dirname, 'template', 'receipt.html'), 'utf8', (err, template) => {
+            if (err) {
+                console.error('Failed to read receipt template:', err);
+                return res.status(500).send('Failed to generate invoice');
+            }
+
+            const receiptHtml = template.replace('<!-- Data rows will be inserted here dynamically -->', receiptRows);
+            const finalReceiptHtml = receiptHtml.replace('<span id="totalAmount"></span>', overallTotalAmount.toFixed(2));
+
+            res.send(finalReceiptHtml);
+        });
+    });
+});
+
+
+// Function to get food price
 function getPrice(foodItem) {
     switch (foodItem) {
         case 'sandwich':
@@ -94,11 +152,9 @@ function getPrice(foodItem) {
         case 'chickenburger':
             return 6.00;
         case '7Days Vanilla Croissant':
-            return 1.00;
         case '7Days Chocolate Croissant':
             return 1.00;
         case 'nasilemak':
-            return 3.00;
         case 'chickenrice':
             return 3.00;
         default:
@@ -106,11 +162,7 @@ function getPrice(foodItem) {
     }
 }
 
-// Serve payment.html
-app.get('/payment', (req, res) => {
-    res.sendFile(path.join(__dirname, 'template', 'payment.html'));
-});
-
+// Start the server
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
 });
