@@ -4,17 +4,13 @@ const path = require('path');
 const app = express();
 const port = 3045;
 
-// Middleware to parse JSON and URL-encoded bodies
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-// Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Path to store user data
 const dataFilePath = path.join(__dirname, 'data.txt');
 
-// Create data file if it doesn't exist
 if (!fs.existsSync(dataFilePath)) {
     try {
         fs.writeFileSync(dataFilePath, '[]', 'utf8');
@@ -63,7 +59,6 @@ app.post('/submit_form', (req, res) => {
         } else if (action === 'login') {
             const user = jsonData.find(user => user.email === email && user.password === password);
             if (user) {
-                // Store user info in localStorage for client-side session management
                 res.status(200).send({ message: 'Log in successful!', user });
             } else {
                 res.status(400).send('Invalid email or password.');
@@ -74,9 +69,6 @@ app.post('/submit_form', (req, res) => {
     });
 });
 
-
-
-// Handle form submission (Jun's server)
 app.get('/submit', (req, res) => {
     const { state, wait, date } = req.query;
     console.log(state, wait, date);
@@ -91,7 +83,6 @@ app.get('/submit', (req, res) => {
         try {
             const jsonData = JSON.parse(data);
 
-            // Filter JSON data based on user input
             const filteredData = jsonData.filter(data => {
                 return data.state === state && data.wait === wait && data.date === date;
             });
@@ -105,12 +96,10 @@ app.get('/submit', (req, res) => {
     });
 });
 
-// Default route to serve frontpage.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'frontpage.html'));
 });
 
-// Start server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
