@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Profile.css">
+    <title>Profile Page</title>
+</head>
+<body>
+
+<div class="profile-container">
+    <nav>
+        <img src="profile.png" class="logo">
+    </nav>
+    <h1 id="username">Username:</h1>
+    <p id="email">Email: </p>
+    <button class="back-button" onclick="goBack()">Back</button>
+    <button class="logout-button" onclick="logout()">Logout</button>
+</div>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+
+    function logout() {
+    alert("Logged out");
+    localStorage.removeItem('user');
+    window.location.href = "frontpage.html";
+}
+
+    window.onload = function() {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user) {
+            document.getElementById('username').textContent = `Username: ${user.name}`;
+            document.getElementById('email').textContent = `Email: ${user.email}`;
+        } else {
+            alert("No user data found. Redirecting to login.");
+            window.location.href = "login.html";
+        }
+    };
+</script>
+
+</body>
+</html>
