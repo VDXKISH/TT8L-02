@@ -12,9 +12,9 @@
             <div class="header">
                 <div class="logo">LIGHTNING BUS</div>
                 <ul class="navigation">
-                    <li><a href="Profile.html">Profile</a></li>
-                    <li><a href="FAQ.HTML">FAQ</a></li>
-                    <li><a href="login.html">Login</a></li>
+                    <li><a href="/Profile">Profile</a></li>
+                    <li><a href="/FAQ">FAQ</a></li>
+                    <li><a href="/bus">Bus Online Ticket</a></li>
                     <li><a href="#" onclick="logout()">Logout</a></li>
                 </ul>
             </div>
@@ -39,6 +39,16 @@
             alert("Logged out");
             window.location.href = "/";
         }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Assuming user data is already stored in localStorage during login
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) {
+            window.location.href = '/'; // Redirect to login if user data is not available
+        }
+    });
+
+    
     </script>
 </body>
 </html>
