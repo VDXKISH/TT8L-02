@@ -13,6 +13,7 @@
         <table class="receipt">
             <thead>
                 <tr>
+                    <th>Batch Id</th>
                     <th>Seat</th>
                     <th>Name</th>
                     <th>Age</th>
@@ -29,7 +30,13 @@
             <h3>Total Amount to be paid: MYR <span id="totalAmount"></span></h3>
         </div>
         <br>
-        <button onclick="window.print()">Generate PDF</button>
+        <button onclick="window.print()">Generate PDF</button><button onclick="goToFrontpage()">Back to Frontpage</button>
+
     </div>
+    <script>
+        function goToFrontpage() {
+            window.location.href = "/frontpage";
+        }        
+    </script>
 </body>
 </html>
