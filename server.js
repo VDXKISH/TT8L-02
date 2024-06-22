@@ -3,14 +3,14 @@ const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid'); // Import UUID module for unique IDs
 const app = express();
-const port = 3047;
+const port = 3000;
 
 // Middleware to parse JSON and URL-encoded bodies
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'statics')));
 
 // Path to store user data
 const dataFilePath = path.join(__dirname, 'data.txt');
@@ -27,7 +27,30 @@ if (!fs.existsSync(dataFilePath)) {
     console.log('Data file exists at:', dataFilePath);
 }
 
-// Handle form submission (submit_form.html)
+// Function to sanitize JSON data
+function sanitizeJSON(data) {
+    const lines = data.split('\n');
+    const jsonLines = [];
+    const nonJsonLines = [];
+
+    lines.forEach(line => {
+        try {
+            jsonLines.push(JSON.parse(line));
+        } catch (e) {
+            if (line.trim() !== '') {
+                nonJsonLines.push(line);
+            }
+        }
+    });
+
+    return { jsonLines, nonJsonLines };
+}
+
+// Serve HTML files from the 'templates' folder
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'templates', 'login.html'));
+});
+
 app.post('/submit_form', (req, res) => {
     const { action, name, email, password } = req.body;
 
@@ -37,36 +60,31 @@ app.post('/submit_form', (req, res) => {
             return res.status(500).send('Internal Server Error: Unable to read data file.');
         }
 
-        let jsonData = [];
-        if (fileData.length > 0) {
-            try {
-                jsonData = JSON.parse(fileData);
-            } catch (parseError) {
-                console.error('Error parsing JSON data:', parseError);
-                return res.status(500).send('Internal Server Error: Invalid JSON data.');
-            }
-        }
+        const { jsonLines, nonJsonLines } = sanitizeJSON(fileData);
 
         if (action === 'signup') {
-            const existingUser = jsonData.find(user => user.email === email);
+            const existingUser = jsonLines.find(user => user.email === email);
             if (existingUser) {
                 return res.status(400).send('User already exists.');
             }
 
-            jsonData.push({ name, email, password });
-            fs.writeFile(dataFilePath, JSON.stringify(jsonData), 'utf8', (err) => {
+            const newUser = { name, email, password };
+            jsonLines.push(newUser);
+
+            const allLines = [...jsonLines.map(data => JSON.stringify(data)), ...nonJsonLines];
+
+            fs.writeFile(dataFilePath, allLines.join('\n') + '\n', 'utf8', (err) => {
                 if (err) {
                     console.error('Error writing file:', err);
                     return res.status(500).send('Internal Server Error: Unable to write data file.');
                 }
 
-                res.status(200).send({ message: 'Sign-up successful!' });
+                res.status(200).json({ message: 'Sign-up successful!' });
             });
         } else if (action === 'login') {
-            const user = jsonData.find(user => user.email === email && user.password === password);
+            const user = jsonLines.find(user => user.email === email && user.password === password);
             if (user) {
-                // Store user info in localStorage for client-side session management
-                res.status(200).send({ message: 'Log in successful!', user });
+                res.status(200).json({ message: 'Log in successful!', user, redirectUrl: '/frontpage' });
             } else {
                 res.status(400).send('Invalid email or password.');
             }
@@ -76,10 +94,57 @@ app.post('/submit_form', (req, res) => {
     });
 });
 
+// Default route to serve frontpage.html
+app.get('/frontpage', (req, res) => {
+    res.sendFile(path.join(__dirname, 'templates', 'frontpage.html'));
+});
+
+app.get('/Profile', (req, res) => {
+    res.sendFile(path.join(__dirname, 'templates', 'Profile.html'));
+});
+
+// Endpoint to update user profile
+app.post('/updateProfile', (req, res) => {
+    const updatedUser = req.body;
+
+    fs.readFile(dataFilePath, 'utf8', (err, fileData) => {
+        if (err) {
+            console.error(`Error reading file: ${dataFilePath}`, err);
+            return res.status(500).send('Internal Server Error: Unable to read data file.');
+        }
+
+        const { jsonLines, nonJsonLines } = sanitizeJSON(fileData);
+        const userIndex = jsonLines.findIndex(user => user.email === updatedUser.email);
+
+        if (userIndex !== -1) {
+            jsonLines[userIndex] = updatedUser;
+            const allLines = [...jsonLines.map(data => JSON.stringify(data)), ...nonJsonLines];
+
+            fs.writeFile(dataFilePath, allLines.join('\n') + '\n', 'utf8', (err) => {
+                if (err) {
+                    console.error('Error writing file:', err);
+                    return res.status(500).send('Internal Server Error: Unable to write data file.');
+                }
+                res.status(200).json({ success: true, message: 'Profile updated successfully!' });
+            });
+        } else {
+            res.status(404).json({ success: false, message: 'User not found.' });
+        }
+    });
+});
+
+app.get('/FAQ', (req, res) => {
+    res.sendFile(path.join(__dirname, 'templates', 'FAQ.html'));
+});
+
+app.get('/bus', (req, res) => {
+    res.sendFile(path.join(__dirname, 'templates', 'bus.html'));
+});
+
 // Endpoint to handle GET request from bus.html form submission
 app.get('/submit', (req, res) => {
     const { state, wait, date } = req.query;
-    
+
     // Read bus data from 'bus.txt' or your data source
     fs.readFile('data.json', 'utf8', (err, data) => {
         if (err) {
@@ -104,37 +169,24 @@ app.get('/submit', (req, res) => {
     });
 });
 
-
 // Serve seat selection page
 app.get('/seat', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'seat.html'));
+    res.sendFile(path.join(__dirname, 'templates', 'seat.html'));
 });
 
-
-// Fetch booked seats for a specific bus and date
 app.get('/bookedSeats', (req, res) => {
-    const { busNumber, date } = req.query;
-
-    fs.readFile('selected_seats.txt', 'utf8', (err, data) => {
+    const busNumber = req.query.busNumber;
+    const date = req.query.date;
+    fs.readFile(dataFilePath, 'utf8', (err, data) => {
         if (err) {
-            console.error('Failed to read selected_seats.txt:', err);
-            return res.status(500).send('Internal Server Error');
+            console.error('Failed to read booked seats:', err);
+            return res.status(500).send('Failed to read booked seats');
         }
 
-        const bookedSeats = [];
-        const lines = data.split('\n');
-        lines.forEach(line => {
-            if (line.trim()) {
-                const parts = line.split(', ');
-                const recordBusNumber = parts.find(part => part.startsWith('Bus Number:')).split(': ')[1];
-                const recordDate = parts.find(part => part.startsWith('Date:')).split(': ')[1];
-                const seat = parts.find(part => part.startsWith('Seat:')).split(': ')[1];
-
-                if (recordBusNumber === busNumber && recordDate === date) {
-                    bookedSeats.push(seat);
-                }
-            }
-        });
+        const { jsonLines } = sanitizeJSON(data);
+        const bookedSeats = jsonLines
+            .filter(booking => booking.busNumber === busNumber && booking.date === date)
+            .flatMap(booking => booking.seats || []);
 
         res.json(bookedSeats);
     });
@@ -142,40 +194,66 @@ app.get('/bookedSeats', (req, res) => {
 
 app.post('/saveSeats', (req, res) => {
     const { selectedSeats, busNumber, date } = req.body;
-    const batchId = uuidv4(); // Unique identifier for this batch of seat selection
+    const batchId = uuidv4();
 
-    const data = selectedSeats.map(seat => {
-        return `BatchId: ${batchId}, Bus Number: ${busNumber}, Date: ${date}, Seat: ${seat}`;
-    }).join('\n') + '\n';
-
-    fs.appendFile('selected_seats.txt', data, (err) => {
+    fs.readFile(dataFilePath, 'utf8', (err, data) => {
         if (err) {
-            console.error('Failed to save selected seats:', err);
-            return res.status(500).send('Failed to save selected seats');
+            console.error('Failed to read data file:', err);
+            return res.status(500).json({ error: 'Failed to save selected seats' });
         }
-        res.redirect('/passenger_details');
+
+        const { jsonLines, nonJsonLines } = sanitizeJSON(data);
+
+        // Check if seats are already booked
+        const existingBookings = jsonLines.filter(booking => 
+            booking.busNumber === busNumber && booking.date === date
+        );
+        const alreadyBookedSeats = existingBookings.flatMap(booking => booking.seats || []);
+        const conflictingSeats = selectedSeats.filter(seat => alreadyBookedSeats.includes(seat));
+
+        if (conflictingSeats.length > 0) {
+            return res.status(400).json({
+                error: 'Some seats are no longer available',
+                conflictingSeats: conflictingSeats
+            });
+        }
+
+        // Add new booking
+        const newBooking = {
+            batchId,
+            busNumber,
+            date,
+            seats: selectedSeats
+        };
+        jsonLines.push(newBooking);
+
+        // Write updated data back to file
+        const updatedData = [...jsonLines.map(JSON.stringify), ...nonJsonLines].join('\n') + '\n';
+        fs.writeFile(dataFilePath, updatedData, 'utf8', (writeErr) => {
+            if (writeErr) {
+                console.error('Failed to save selected seats:', writeErr);
+                return res.status(500).json({ error: 'Failed to save selected seats' });
+            }
+            res.status(200).json({ 
+                redirectUrl: `/passenger_details?seats=${encodeURIComponent(JSON.stringify(selectedSeats))}&busNumber=${encodeURIComponent(busNumber)}&date=${encodeURIComponent(date)}`
+            });
+        });
     });
 });
 
-// Default route to serve frontpage.html
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'frontpage.html'));
-});
-
-// Serve passenger details page
+// Serve passenger_details page
 app.get('/passenger_details', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'passenger_details.html'));
-});
+    res.sendFile(path.join(__dirname, 'templates', 'passenger_details.html'));
+    });
+
 
 app.post('/savePassengerDetails', (req, res) => {
     const passengerDetails = req.body.passengers;
     const batchId = uuidv4(); // Unique identifier for this batch of passenger details
-
-    latestBatchId = batchId; // Update the latest batch ID
-
     let overallTotalAmount = 0;
 
-    const data = passengerDetails.map(passenger => {
+    // Create data string for new passenger details
+    const newData = passengerDetails.map(passenger => {
         let ticketPrice;
         if (passenger.age >= 4 && passenger.age <= 12) {
             ticketPrice = 12;
@@ -197,44 +275,53 @@ app.post('/savePassengerDetails', (req, res) => {
         }
 
         let totalPrice = ticketPrice + foodTotalAmount;
-
         overallTotalAmount += totalPrice;
 
         return `BatchId: ${batchId}, Seat: ${passenger.seat}, Name: ${passenger.name}, Age: ${passenger.age}, Ticket Price: MYR ${ticketPrice}, Food Order: ${JSON.stringify(foodOrder)}, Total Amount: MYR ${totalPrice}\n`;
     }).join('');
 
-    fs.appendFile('selected_seats.txt', data, (err) => {
+    // Append new data to data.txt
+    fs.appendFile('data.txt', newData, 'utf8', (err) => {
         if (err) {
             console.error('Failed to save passenger details:', err);
             return res.status(500).send('Failed to save passenger details');
         }
+
+        // Set latestBatchId after saving data
+        latestBatchId = batchId;
+
         console.log('Passenger details saved successfully');
         res.status(200).send(overallTotalAmount.toFixed(2));
     });
 });
 
+
+
 // Serve payment page
 app.get('/payment', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'payment.html'));
+res.sendFile(path.join(__dirname, 'templates', 'payment.html'));
 });
 
 // Handle payment submission
 app.post('/payment', (req, res) => {
-    // Process payment logic here
-    // Assuming validation and processing of payment data
-
-    // Redirect to receipt page after payment processing
-    res.redirect('/receipt');
+res.redirect('/receipt');
 });
 
+// Endpoint to serve receipt
 app.get('/receipt', (req, res) => {
-    fs.readFile('selected_seats.txt', 'utf8', (err, data) => {
+    fs.readFile('data.txt', 'utf8', (err, data) => {
         if (err) {
             console.error('Failed to read passenger details:', err);
             return res.status(500).send('Failed to generate invoice');
         }
 
         const passengers = data.split('\n').filter(line => line.trim() !== '');
+
+        // Ensure latestBatchId is defined before filtering
+        if (!latestBatchId) {
+            console.error('latestBatchId is not defined');
+            return res.status(500).send('Failed to generate invoice');
+        }
 
         const filteredPassengers = passengers.filter(passenger => passenger.includes(`BatchId: ${latestBatchId}`));
 
@@ -257,7 +344,7 @@ app.get('/receipt', (req, res) => {
             `;
         }).join('');
 
-        fs.readFile(path.join(__dirname, 'public', 'receipt.html'), 'utf8', (err, template) => {
+        fs.readFile(path.join(__dirname, 'templates', 'receipt.html'), 'utf8', (err, template) => {
             if (err) {
                 console.error('Failed to read receipt template:', err);
                 return res.status(500).send('Failed to generate invoice');
